@@ -1,0 +1,6 @@
+#Internal variables for the Docker role.
+
+#Avoid modifying these values unless you understand the role's implementation.
+---
+docker_service_name: docker
+docker_group_name: docker

@@ -1,0 +1,23 @@
+---
+- name: Create Nginx website directory
+  ansible.builtin.file:
+    path: "{{ nginx_website_path }}"
+    state: directory
+    mode: '0755'
+
+- name: Copy website homepage
+  ansible.builtin.copy:
+    src: index.html
+    dest: "{{ nginx_website_path }}/index.html"
+    mode: '0644'
+
+- name: Run Nginx container
+  community.docker.docker_container:
+    name: nginx
+    image: "{{ nginx_image }}"
+    state: started
+    restart_policy: "{{ container_restart_policy }}"
+    ports:
+      - "{{ nginx_port }}:80"
+    volumes:
+      - "{{ nginx_website_path }}:/usr/share/nginx/html:ro"

@@ -1,0 +1,7 @@
+---
+- name: Install Docker locally
+  hosts: local
+  become: true
+
+  roles:
+    - docker

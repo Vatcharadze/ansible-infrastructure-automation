@@ -1,0 +1,22 @@
+---
+- name: Ensure connection is good #only returns value('pong','crash') if the python is installed on source server 
+  ansible.builtin.ping:
+
+- name: Update apt package repository
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Upgrade apt package repository
+  apt:
+    upgrade: safe
+
+- name: Install essential packages
+  apt:
+    name: "{{ essential_packages_list }}"
+    state: present
+
+- name: Update Timezone
+  community.general.timezone:
+    name: "{{ timezone_name }}"
+

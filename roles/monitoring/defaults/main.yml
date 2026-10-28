@@ -1,0 +1,8 @@
+monitoring_network: monitoring
+
+prometheus_dir: /opt/prometheus
+prometheus_config_path: /opt/prometheus/prometheus.yaml
+prometheus_image: prom/prometheus:latest
+prometheus_port: 9090
+
+node_exporter_image: prom/node-exporter:latest

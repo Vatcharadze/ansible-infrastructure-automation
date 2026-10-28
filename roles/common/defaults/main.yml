@@ -1,0 +1,10 @@
+---
+essential_packages_list: #add or remove any package
+  - curl
+  - wget
+  - git
+  - unzip
+  - vim
+  - tree
+
+timezone_name: Europe/Tbilisi #change to your specific timezone

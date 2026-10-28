@@ -1,0 +1,55 @@
+---
+- name: Create a Monitoring Network
+  community.docker.docker_network:
+    name: "{{ monitoring_network }}"
+    state: present
+
+- name: Create a Prometheus log dir
+  ansible.builtin.file:
+    path: "{{ prometheus_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Copy Prometheus config file to server
+  ansible.builtin.copy:
+    src: prometheus.yml
+    dest: "{{ prometheus_config_path }}"
+    mode: '0644'
+
+- name: Run Node Exporter container
+  community.docker.docker_container:
+    name: node-exporter
+    image: "{{ node_exporter_image }}"
+    state: started
+    restart_policy: unless-stopped
+    pid_mode: host
+    command:
+      - "--path.rootfs=/host"
+    volumes:
+      - "/:/host:ro,rslave"
+    networks:
+      - name: "{{ monitoring_network }}"
+
+- name: Run Prometheus container
+  community.docker.docker_container:
+    name: prometheus
+    image: "{{ prometheus_image }}"
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "{{ prometheus_port }}:9090"
+    volumes:
+      - "{{ prometheus_config_path }}:/etc/prometheus/prometheus.yml:ro"
+      - "prometheus_data:/prometheus"
+    networks:
+      - name: "{{ monitoring_network }}"
+
+- name: Wait for Prometheus to become available
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ prometheus_port }}/-/ready"
+    method: GET
+    status_code: 200
+  register: prometheus_health
+  retries: 10
+  delay: 3
+  until: prometheus_health.status == 200

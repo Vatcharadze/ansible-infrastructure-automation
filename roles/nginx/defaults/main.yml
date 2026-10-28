@@ -1,0 +1,5 @@
+---
+nginx_image: nginx:stable
+container_restart_policy: unless-stopped
+nginx_website_path: /opt/nginx/html
+nginx_port: 80

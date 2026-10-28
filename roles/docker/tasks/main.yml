@@ -1,0 +1,47 @@
+---
+- name: Install required system packages
+  ansible.builtin.apt:
+    pkg: "{{ docker_packages }}"
+    state: "{{ docker_packages_state }}"
+    update_cache: yes
+
+- name: Ensure /etc/apt/keyrings Exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Add Docker GPG apt Key
+  ansible.builtin.get_url:
+    url: "{{ docker_gpg_url }}"
+    dest: "{{ docker_keyring_path }}"
+    mode: '0644'
+
+- name: Add Docker Repository
+  ansible.builtin.deb822_repository:
+    repo: "{{ docker_apt_repository }}"
+    state: "{{ docker_packages_state }}"
+
+- name: Install Docker Engine and Plugins
+  ansible.builtin.apt:
+    pkg: "{{ docker_plugins }}"    
+    state: "{{ docker_packages_state }}"
+    update_cache: yes
+
+- name: Ensure Docker is enabled and running
+  ansible.builtin.service:
+    name: "{{ docker_service_name }}"
+    state: started
+    enabled: true
+
+- name: Ensure Docker group exists
+  ansible.builtin.group:
+    name: "{{ docker_service_name }}"
+    state: present
+
+- name: Add users to Docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: "{{ docker_group_name }}"
+    append: true
+  loop: "{{ docker_users }}"
