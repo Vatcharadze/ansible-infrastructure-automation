@@ -1,7 +1,10 @@
 ---
-- name: Install Docker locally
-  hosts: local
+- name: Configure And Provision Servers
+  hosts: target_servers
   become: true
 
   roles:
+    - common
     - docker
+    - nginx
+    - monitoring
