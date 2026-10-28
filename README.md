@@ -83,8 +83,10 @@ ansible-galaxy install -r requirements.yml
 
 Open `inventory/hosts.ini` and add your server details:
 
+The playbook targets the `target_servers` group, so your hosts must be listed under it:
+
 ```ini
-[servers]
+[target_servers]
 my-server ansible_host=YOUR_SERVER_IP ansible_user=YOUR_USER
 ```
 
@@ -106,10 +108,10 @@ If `sudo` requires a password:
 ansible-playbook playbooks/site.yml --ask-become-pass
 ```
 
-Run only a specific role (if tags are defined in the playbook):
+Run against a single host from the `target_servers` group:
 
 ```bash
-ansible-playbook playbooks/site.yml --tags nginx
+ansible-playbook playbooks/site.yml --limit my-server
 ```
 
 Syntax check and dry run:
@@ -120,6 +122,8 @@ ansible-playbook playbooks/site.yml --check
 ```
 
 ## Roles
+
+The main playbook (`playbooks/site.yml`) runs against the `target_servers` group with privilege escalation (`become: true`) and applies the roles in this order: `common` → `docker` → `nginx` → `monitoring`.
 
 | Role | Purpose |
 |------|---------|
@@ -159,6 +163,3 @@ curl http://YOUR_SERVER_IP:9090
 ## License
 
 No license has been added yet. If you want others to be able to use this project, add a `LICENSE` file (e.g. MIT).
-
-
-
